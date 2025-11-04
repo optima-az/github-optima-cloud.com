@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Çıxış edildi" %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="alert alert-info">
+            {% trans "Sistemdən uğurla çıxış etdiniz." %}
+        </div>
+        <a href="{% url 'login' %}" class="btn btn-primary">{% trans "Yenidən daxil ol" %}</a>
+    </div>
+</div>
+{% endblock %}

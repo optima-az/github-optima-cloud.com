@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Daxil ol" %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white text-center">
+                <h5 class="mb-0">{% trans "Sistemə giriş" %}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label" for="id_username">{% trans "İstifadəçi adı" %}</label>
+                        <input type="text" name="username" autofocus autocomplete="username"
+                               maxlength="150" class="form-control" required id="id_username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="id_password">{% trans "Şifrə" %}</label>
+                        <input type="password" name="password" autocomplete="current-password"
+                               class="form-control" required id="id_password">
+                    </div>
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% trans "Giriş məlumatları yanlışdır." %}
+                        </div>
+                    {% endif %}
+                    <button class="btn btn-primary w-100" type="submit">{% trans "Daxil ol" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

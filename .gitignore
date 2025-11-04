@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Environments
+.env
+.env.*
+venv/
+.venv/
+
+# Django collectstatic
+staticfiles/
+poultry_platform/staticfiles/
+poultry_platform/media/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
