@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Quşlara Baxış Paneli" %}{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-title text-muted text-uppercase">{% trans "Son 7 gündə yem" %}</h6>
+                <p class="display-6 fw-bold">{{ feed_last_7_days|floatformat:2 }} <small class="text-muted">kg</small></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-title text-muted text-uppercase">{% trans "Son 7 gündə yumurta" %}</h6>
+                <p class="display-6 fw-bold">{{ eggs_last_7_days }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="card-title text-muted text-uppercase">{% trans "Son 7 gündə tələfat" %}</h6>
+                <p class="display-6 fw-bold">{{ mortality_last_7_days }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{% trans "Aktiv partiyalar" %}</h5>
+                <a href="{% url 'poultry:batch-create' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-circle"></i> {% trans "Yeni partiya" %}
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>{% trans "Kod" %}</th>
+                        <th>{% trans "Növ" %}</th>
+                        <th>{% trans "Sahə" %}</th>
+                        <th>{% trans "Cari say" %}</th>
+                        <th>{% trans "Gətirilmə" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for batch in active_batches %}
+                        <tr>
+                            <td>{{ batch.code }}</td>
+                            <td>{{ batch.species.name }}</td>
+                            <td>{{ batch.location.name }}</td>
+                            <td>{{ batch.current_quantity }}</td>
+                            <td>{{ batch.arrival_date }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">{% trans "Aktiv partiya yoxdur" %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">{% trans "Son əməliyyatlar" %}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>{% trans "Yemləmə" %}</h6>
+                        <ul class="list-group list-group-flush">
+                            {% for log in recent_feed_logs %}
+                                <li class="list-group-item px-0 d-flex justify-content-between">
+                                    <span>{{ log.batch.code }} - {{ log.record_date }}</span>
+                                    <span class="fw-semibold">{{ log.quantity_kg|floatformat:2 }} kg</span>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item px-0 text-muted">{% trans "Qeyd yoxdur" %}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>{% trans "İstehsal" %}</h6>
+                        <ul class="list-group list-group-flush">
+                            {% for log in recent_production_logs %}
+                                <li class="list-group-item px-0 d-flex justify-content-between">
+                                    <span>{{ log.batch.code }} - {{ log.record_date }}</span>
+                                    <span class="fw-semibold">{{ log.eggs_total }}</span>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item px-0 text-muted">{% trans "Qeyd yoxdur" %}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>{% trans "Tələfat" %}</h6>
+                        <ul class="list-group list-group-flush">
+                            {% for log in recent_mortality_logs %}
+                                <li class="list-group-item px-0 d-flex justify-content-between">
+                                    <span>{{ log.batch.code }} - {{ log.record_date }}</span>
+                                    <span class="fw-semibold text-danger">{{ log.count }}</span>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item px-0 text-muted">{% trans "Qeyd yoxdur" %}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">{% trans "Ən məhsuldar partiyalar" %}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for batch in top_batches %}
+                        <li class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">{{ batch.code }}</div>
+                                    <small class="text-muted">{{ batch.species.name }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-semibold text-success">{% trans "Yumurta" %}: {{ batch.eggs_7_days|default:0 }}</div>
+                                    <div class="text-danger">{% trans "Tələfat" %}: {{ batch.mortality_7_days|default:0 }}</div>
+                                </div>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-muted">{% trans "Hesablamaq üçün məlumat yoxdur" %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">{% trans "Tez əmrlər" %}</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action" href="{% url 'poultry:feed-log-create' %}">
+                    <i class="bi bi-basket me-2"></i>{% trans "Yem qeydi əlavə et" %}
+                </a>
+                <a class="list-group-item list-group-item-action" href="{% url 'poultry:production-log-create' %}">
+                    <i class="bi bi-egg-fried me-2"></i>{% trans "Yumurta istehsalı qeydi" %}
+                </a>
+                <a class="list-group-item list-group-item-action" href="{% url 'poultry:mortality-log-create' %}">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{% trans "Tələfat qeydi" %}
+                </a>
+                <a class="list-group-item list-group-item-action" href="{% url 'poultry:sale-record-create' %}">
+                    <i class="bi bi-currency-dollar me-2"></i>{% trans "Satış qeydi" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
